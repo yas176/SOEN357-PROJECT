@@ -1,16 +1,79 @@
-# React + Vite
+# CramGuard - Study Session Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based web application that helps students break down assignments into focused work sessions with smart commit blocks.
 
-Currently, two official plugins are available:
+## Quick Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
+-Tailwind (v3)
 
-## React Compiler
+### Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Clone the repository**
+```bash
+   git clone https://github.com/yas176/SOEN357-PROJECT.git
+   cd project357
+```
 
-## Expanding the ESLint configuration
+2. **Install dependencies**
+```bash
+   npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. **Run the development server**
+```bash
+   npm run dev
+```
+
+4. **Open your browser**
+   - Navigate to `http://localhost:5173` (or the URL shown in terminal)
+   - You should see the CramGuard welcome page
+
+##  Project Structure
+```
+project357/
+├── src/
+│   ├── components/
+│   │   ├── auth/
+│   │   │   ├── SignUpForm.jsx
+│   │   │   ├── SignInForm.jsx
+│   │   │   └── SocialLogin.jsx
+│   │   ├── ui/
+│   │   │   ├── Button.jsx
+│   │   │   ├── Input.jsx
+│   │   │   └── Logo.jsx
+│   │   └── layout/
+│   │       └── AuthLayout.jsx
+│   ├── pages/
+│   │   ├── SignUp.jsx
+│   │   └── SignIn.jsx
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── package.json
+├── tailwind.config.js
+├── postcss.config.js
+└── index.html
+##  Current Pages
+
+### 1. Welcome Page
+- Landing page with features, testimonials, FAQ
+- **Entry point** when app loads
+- Click "Start Planning" → redirects to Sign Up
+
+### 2. Sign Up Page
+- User registration form
+- Stores user data in `localStorage`
+- After signup → redirects to Sign In page
+
+### 3. Sign In Page
+- User authentication
+- After successful login → redirects to Progress Page
+
+### 4. Progress Page (TODO)
+- **Currently shows a placeholder**
+- **This is where you'll implement the main functionality**
+- Logged-in user's email is available via `userEmail` prop
+
