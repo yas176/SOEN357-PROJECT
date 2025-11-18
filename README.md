@@ -35,27 +35,15 @@ A React-based web application that helps students break down assignments into fo
 ```
 project357/
 ├── src/
-│   ├── components/
-│   │   ├── auth/
-│   │   │   ├── SignUpForm.jsx
-│   │   │   ├── SignInForm.jsx
-│   │   │   └── SocialLogin.jsx
-│   │   ├── ui/
-│   │   │   ├── Button.jsx
-│   │   │   ├── Input.jsx
-│   │   │   └── Logo.jsx
-│   │   └── layout/
-│   │       └── AuthLayout.jsx
-│   ├── pages/
-│   │   ├── SignUp.jsx
-│   │   └── SignIn.jsx
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-├── package.json
-├── tailwind.config.js
-├── postcss.config.js
-└── index.html
+│   ├── App.jsx           (main file with all pages)
+│   ├── main.jsx         
+│   └── index.css        
+├── public/
+├── tailwind.config.js   
+├── postcss.config.js    
+├── package.json         
+├── package-lock.json    
+└── README.md   
 ##  Current Pages
 
 ### 1. Welcome Page
