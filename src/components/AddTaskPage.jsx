@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import Header from './Header';
 
-function AddTaskPage({ onLogout, userEmail, onBack }) {
+function AddTaskPage({ userEmail, onBack }) {
   const [title, setTitle] = useState('');
   const [deadline, setDeadline] = useState('');
   const [priority, setPriority] = useState('medium');
@@ -57,7 +56,6 @@ function AddTaskPage({ onLogout, userEmail, onBack }) {
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
-      <Header userEmail={userEmail} onLogout={onLogout} onAddTask={null} />
       
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-8">

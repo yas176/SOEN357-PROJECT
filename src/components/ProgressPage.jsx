@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import Header from './Header';
 
-function ProgressPage({ onLogout, userEmail, onAddTask }) {
+function ProgressPage({userEmail}) {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
@@ -108,7 +107,6 @@ function ProgressPage({ onLogout, userEmail, onAddTask }) {
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
-      <Header userEmail={userEmail} onLogout={onLogout} onAddTask={onAddTask} />
 
       <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 text-left">
         <div className="max-w-6xl mx-auto">

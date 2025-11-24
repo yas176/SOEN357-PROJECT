@@ -3,6 +3,9 @@ import WelcomePage from './components/WelcomePage';
 import AuthPage from './components/AuthPage';
 import AddTaskPage from './components/AddTaskPage';
 import ProgressPage from './components/ProgressPage';
+import Header from './components/Header';
+import AccountPage from './components/AccountPage';
+import SettingsPage from './components/SettingsPage.jsx';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('welcome');
@@ -27,6 +30,8 @@ export default function App() {
   const [success, setSuccess] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  
 
   // Check if user is already logged in on mount
   useEffect(() => {
@@ -122,15 +127,69 @@ export default function App() {
     setSuccess('');
   };
 
+  const navigateLoggedIn = (view) => {
+        setLoggedInPage(view);
+        if (view === 'progress') {
+            setRefreshKey(prev => prev + 1); 
+        }
+  };
+
+
   // If user is logged in, show appropriate page
   if (currentUser) {
+    let contentComponent;
+      let onAddTaskHandler = () => navigateLoggedIn('addtask');
+
+      // addtask brings to addtaskpage
     if (loggedInPage === 'addtask') {
-      return <AddTaskPage onLogout={handleLogout} userEmail={currentUser.email} onBack={() => {
-        setLoggedInPage('progress');
-        setRefreshKey(prev => prev + 1); // Force refresh of ProgressPage
-      }} />;
+      // we dont want the button "add task" when we're adding a task
+      onAddTaskHandler=null;
+      contentComponent = (
+          <AddTaskPage 
+              onLogout={handleLogout} 
+              userEmail={currentUser.email} 
+              onBack={() => navigateLoggedIn('progress')}
+          />
+      );
+    } 
+      
+    //go to the setting page
+    else if (loggedInPage === 'settings') {
+        contentComponent = <SettingsPage />; 
     }
-    return <ProgressPage key={refreshKey} onLogout={handleLogout} userEmail={currentUser.email} onAddTask={() => setLoggedInPage('addtask')} />;
+
+    //go to the account page
+    else if (loggedInPage === 'account') {
+        contentComponent = <AccountPage 
+        currentUser={currentUser} />;
+    }
+    
+    // it will be the default page
+    else { 
+        contentComponent = (
+            <ProgressPage 
+                key={refreshKey} 
+                onLogout={handleLogout} 
+                userEmail={currentUser.email} 
+            />
+        );
+    }
+
+    // header is always shown when logged in
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <Header 
+                userEmail={currentUser.email} 
+                onLogout={handleLogout} 
+                currentPage={loggedInPage}
+                onAddTask={onAddTaskHandler}
+                onNavigate={navigateLoggedIn}
+            />
+            <main >
+                {contentComponent}
+            </main>
+        </div>
+    );
   }
 
   // Show welcome page
