@@ -3,13 +3,14 @@ import WelcomePage from './components/WelcomePage';
 import AuthPage from './components/AuthPage';
 import AddTaskPage from './components/AddTaskPage';
 import ProgressPage from './components/ProgressPage';
+import PlannerPage from './components/PlannerPage';
 import Header from './components/Header';
 import AccountPage from './components/AccountPage';
 import SettingsPage from './components/SettingsPage.jsx';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('welcome');
-  const [loggedInPage, setLoggedInPage] = useState('progress');
+  const [loggedInPage, setLoggedInPage] = useState('planner');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -118,7 +119,7 @@ export default function App() {
     localStorage.removeItem('cramguard_currentUser');
     setCurrentUser(null);
     setCurrentPage('welcome');
-    setLoggedInPage('progress');
+    setLoggedInPage('planner');
   };
 
   const handleTogglePage = () => {
@@ -129,7 +130,7 @@ export default function App() {
 
   const navigateLoggedIn = (view) => {
         setLoggedInPage(view);
-        if (view === 'progress') {
+        if (view === 'progress' || view === 'planner') {
             setRefreshKey(prev => prev + 1); 
         }
   };
@@ -148,10 +149,20 @@ export default function App() {
           <AddTaskPage 
               onLogout={handleLogout} 
               userEmail={currentUser.email} 
-              onBack={() => navigateLoggedIn('progress')}
+              onBack={() => navigateLoggedIn('planner')}
           />
       );
     } 
+    
+    //go to the planner page
+    else if (loggedInPage === 'planner') {
+        contentComponent = (
+            <PlannerPage 
+                key={refreshKey}
+                userEmail={currentUser.email} 
+            />
+        );
+    }
       
     //go to the setting page
     else if (loggedInPage === 'settings') {

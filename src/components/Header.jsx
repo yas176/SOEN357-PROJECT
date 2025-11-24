@@ -16,8 +16,7 @@ function Header({ userEmail, onLogout, onAddTask, currentPage, onNavigate }) {
   };
 
   const navigationLinks = [
-    { view: 'addtask', label: 'Planner' },
-    { view: 'progress', label: 'Progress' },
+    { view: 'planner', label: 'Planner' },
     { view: 'settings', label: 'Settings' },
     { view: 'account', label: 'Account' },
   ];
@@ -46,6 +45,12 @@ function Header({ userEmail, onLogout, onAddTask, currentPage, onNavigate }) {
       
       
       <div className="flex items-center gap-4">
+        <button
+          onClick={() => onNavigate('progress')}
+          className="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors"
+        >
+          Task Dashboard
+        </button>
         {onAddTask && (
           <button
             onClick={onAddTask}
