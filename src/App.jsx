@@ -164,10 +164,16 @@ export default function App() {
         );
     }
       
-    //go to the setting page
-    else if (loggedInPage === 'settings') {
-        contentComponent = <SettingsPage />; 
-    }
+// go to the settings page
+else if (loggedInPage === 'settings') {
+  contentComponent = (
+    <SettingsPage
+      userEmail={currentUser.email}
+      onNavigate={navigateLoggedIn}
+    />
+  );
+}
+
 
     //go to the account page
     else if (loggedInPage === 'account') {
