@@ -14,7 +14,6 @@ function SettingsPage({ userEmail, onNavigate }) {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [saveStatus, setSaveStatus] = useState(null); // 'saved' | 'reset' | 'error' | null
 
-  /
   useEffect(() => {
     if (!userEmail) return;
 
