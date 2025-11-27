@@ -1,54 +1,73 @@
 import { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 
-function ProgressPage({userEmail}) {
+// use the SAME storage convention as PlannerView
+const getTasksKey = (email) => `cramguard_tasks_${email}`;
+
+function ProgressPage({ userEmail }) {
   const [tasks, setTasks] = useState([]);
 
+  // load this user's tasks
   useEffect(() => {
-    const tasksData = JSON.parse(localStorage.getItem('cramguard_tasks') || '{}');
-    const userTasks = tasksData[userEmail] || [];
-    setTasks(userTasks);
+    const stored = JSON.parse(
+      localStorage.getItem(getTasksKey(userEmail)) || '[]'
+    );
+    setTasks(stored);
   }, [userEmail]);
 
   const refreshTasks = () => {
-    const tasksData = JSON.parse(localStorage.getItem('cramguard_tasks') || '{}');
-    const userTasks = tasksData[userEmail] || [];
-    setTasks(userTasks);
+    const stored = JSON.parse(
+      localStorage.getItem(getTasksKey(userEmail)) || '[]'
+    );
+    setTasks(stored);
   };
 
   const handleComplete = (taskId) => {
-    const tasksData = JSON.parse(localStorage.getItem('cramguard_tasks') || '{}');
-    const userTasks = tasksData[userEmail] || [];
-    const updatedTasks = userTasks.map(task => 
-      task.id === taskId 
+    const stored = JSON.parse(
+      localStorage.getItem(getTasksKey(userEmail)) || '[]'
+    );
+
+    const updated = stored.map((task) =>
+      task.id === taskId
         ? { ...task, completed: true, completedAt: new Date().toISOString() }
         : task
     );
-    tasksData[userEmail] = updatedTasks;
-    localStorage.setItem('cramguard_tasks', JSON.stringify(tasksData));
-    refreshTasks();
+
+    localStorage.setItem(getTasksKey(userEmail), JSON.stringify(updated));
+    setTasks(updated);
   };
 
   const handleDelete = (taskId) => {
-    if (window.confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
-      const tasksData = JSON.parse(localStorage.getItem('cramguard_tasks') || '{}');
-      const userTasks = tasksData[userEmail] || [];
-      const updatedTasks = userTasks.filter(task => task.id !== taskId);
-      tasksData[userEmail] = updatedTasks;
-      localStorage.setItem('cramguard_tasks', JSON.stringify(tasksData));
-      refreshTasks();
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this task? This action cannot be undone.'
+      )
+    ) {
+      return;
     }
+
+    const stored = JSON.parse(
+      localStorage.getItem(getTasksKey(userEmail)) || '[]'
+    );
+    const updated = stored.filter((task) => task.id !== taskId);
+
+    localStorage.setItem(getTasksKey(userEmail), JSON.stringify(updated));
+    setTasks(updated);
   };
 
-  const ongoingTasks = tasks.filter(task => !task.completed);
-  const completedTasks = tasks.filter(task => task.completed);
+  const ongoingTasks = tasks.filter((task) => !task.completed);
+  const completedTasks = tasks.filter((task) => task.completed);
 
-  const completedWithDeadline = completedTasks.filter((t) => t.deadline);
+  // Planner uses `dueDate`; Progress might use `deadline` – support both
+  const getDeadline = (task) => task.deadline || task.dueDate || null;
+
+  const completedWithDeadline = completedTasks.filter((t) => getDeadline(t));
 
   const earlyFinished = completedWithDeadline.filter((t) => {
-    if (!t.completedAt || !t.deadline) return false;
+    const deadlineStr = getDeadline(t);
+    if (!t.completedAt || !deadlineStr) return false;
     const completedAtDate = new Date(t.completedAt);
-    const deadlineDate = new Date(t.deadline);
+    const deadlineDate = new Date(deadlineStr);
     return completedAtDate <= deadlineDate;
   });
 
@@ -74,13 +93,13 @@ function ProgressPage({userEmail}) {
 
   // Weekly activity counts (Mon–Sun)
   const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const weekdayOrder = [1, 2, 3, 4, 5, 6, 0]; 
+  const weekdayOrder = [1, 2, 3, 4, 5, 6, 0];
   const weekdayCounts = [0, 0, 0, 0, 0, 0, 0];
 
   completedTasks.forEach((task) => {
     if (!task.completedAt) return;
     const d = new Date(task.completedAt);
-    const jsDay = d.getDay(); 
+    const jsDay = d.getDay();
     const idx = weekdayOrder.indexOf(jsDay);
     if (idx !== -1) weekdayCounts[idx] += 1;
   });
@@ -125,73 +144,82 @@ function ProgressPage({userEmail}) {
     }
   };
 
-  const TaskCard = ({ task, showCompleteButton }) => (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors relative">
-      {/* Delete button - top right */}
-      <button
-        onClick={() => handleDelete(task.id)}
-        className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-        title="Delete task"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+  const TaskCard = ({ task, showCompleteButton }) => {
+    const deadline = getDeadline(task);
+    return (
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors relative">
+        {/* Delete button - top right */}
+        <button
+          onClick={() => handleDelete(task.id)}
+          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+          title="Delete task"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
 
-      <div className="flex flex-col gap-4 pr-8">
-        {/* Title and badges */}
-        <div className="flex items-start gap-3">
-          <h3 className="text-xl font-semibold text-white flex-1">
-            {task.title}
-          </h3>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Priority Badge */}
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
-                task.priority
-              )}`}
-            >
-              {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-            </span>
-            {/* Category Badge */}
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryColor(
-                task.category
-              )}`}
-            >
-              {task.category.charAt(0).toUpperCase() + task.category.slice(1)}
+        <div className="flex flex-col gap-4 pr-8">
+          {/* Title and badges */}
+          <div className="flex items-start gap-3">
+            <h3 className="text-xl font-semibold text-white flex-1">
+              {task.title}
+            </h3>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Priority Badge */}
+              {task.priority && (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
+                    task.priority
+                  )}`}
+                >
+                  {task.priority.charAt(0).toUpperCase() +
+                    task.priority.slice(1)}
+                </span>
+              )}
+              {/* Category Badge */}
+              {task.category && (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${getCategoryColor(
+                    task.category
+                  )}`}
+                >
+                  {task.category.charAt(0).toUpperCase() +
+                    task.category.slice(1)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Description */}
+          {task.description && (
+            <p className="text-gray-300 text-sm whitespace-pre-wrap">
+              {task.description}
+            </p>
+          )}
+
+          {/* Deadline */}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-400">Deadline:</span>
+            <span className="text-white font-medium">
+              {formatDate(deadline)}
             </span>
           </div>
+
+          {/* Complete button - only for ongoing tasks */}
+          {showCompleteButton && (
+            <button
+              onClick={() => handleComplete(task.id)}
+              className="w-full bg-teal-400 hover:bg-teal-500 text-slate-900 font-semibold px-4 py-2 rounded-lg transition-colors mt-2"
+            >
+              Complete
+            </button>
+          )}
         </div>
-
-        {/* Description */}
-        {task.description && (
-          <p className="text-gray-300 text-sm whitespace-pre-wrap">
-            {task.description}
-          </p>
-        )}
-
-        {/* Deadline */}
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-gray-400">Deadline:</span>
-          <span className="text-white font-medium">
-            {formatDate(task.deadline)}
-          </span>
-        </div>
-
-        {/* Complete button - only for ongoing tasks */}
-        {showCompleteButton && (
-          <button
-            onClick={() => handleComplete(task.id)}
-            className="w-full bg-teal-400 hover:bg-teal-500 text-slate-900 font-semibold px-4 py-2 rounded-lg transition-colors mt-2"
-          >
-            Complete
-          </button>
-        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   const handleExportCSV = () => {
-    if (!tasks.length) return;
+    console.log('Export clicked, tasks = ', tasks.length);
 
     const header = [
       'Title',
@@ -206,7 +234,7 @@ function ProgressPage({userEmail}) {
 
     const rows = tasks.map((t) => [
       t.title || '',
-      t.deadline || '',
+      getDeadline(t) || '',
       t.priority || '',
       t.category || '',
       (t.description || '').replace(/\n/g, ' '),
@@ -347,7 +375,11 @@ function ProgressPage({userEmail}) {
               ) : (
                 <div className="space-y-4">
                   {ongoingTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} showCompleteButton={true} />
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      showCompleteButton={true}
+                    />
                   ))}
                 </div>
               )}
@@ -365,7 +397,11 @@ function ProgressPage({userEmail}) {
               ) : (
                 <div className="space-y-4">
                   {completedTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} showCompleteButton={false} />
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      showCompleteButton={false}
+                    />
                   ))}
                 </div>
               )}
@@ -392,14 +428,16 @@ function ProgressPage({userEmail}) {
           {/* Weekly Activity */}
           <section className="bg-slate-800 border border-slate-700 rounded-xl px-6 py-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm font-semibold text-white">Weekly Activity</p>
+              <p className="text-sm font-semibold text-white">
+                Weekly Activity
+              </p>
             </div>
 
             <div className="h-40 flex items-end gap-4">
               {weekdayLabels.map((label, index) => {
                 const count = weekdayCounts[index];
                 const heightPercent =
-                  count === 0 ? 5 : (count / maxCount) * 80 + 10; 
+                  count === 0 ? 5 : (count / maxCount) * 80 + 10;
                 return (
                   <div
                     key={label}
