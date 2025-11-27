@@ -151,7 +151,12 @@ export default function App() {
       
     // Settings page
     else if (loggedInPage === 'settings') {
-        contentComponent = <SettingsPage />; 
+        contentComponent = (
+            <SettingsPage
+                userEmail={currentUser.email}
+                onNavigate={navigateLoggedIn}
+            />
+        );
     }
 
     // Account page
