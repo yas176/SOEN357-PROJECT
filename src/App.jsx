@@ -41,6 +41,11 @@ export default function App() {
     }
   }, []);
 
+  const handleUpdateCurrentUser = (updatedUser) => {
+    setCurrentUser(updatedUser);
+    localStorage.setItem("cramguard_currentUser", JSON.stringify(updatedUser));
+  };
+
   const handleSignup = () => {
     setError('');
     setSuccess('');
@@ -162,7 +167,9 @@ export default function App() {
     // Account page
     else if (loggedInPage === 'account') {
         contentComponent = <AccountPage 
-        currentUser={currentUser} />;
+        currentUser={currentUser}
+        onUpdateCurrentUser={handleUpdateCurrentUser}
+        onLogout={handleLogout} />;
     }
     
     // Progress page (default fallback)
