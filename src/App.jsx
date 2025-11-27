@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import WelcomePage from './components/WelcomePage';
 import AuthPage from './components/AuthPage';
-import AddTaskPage from './components/AddTaskPage';
+import { PlannerView } from './components/PlannerPage.jsx';
 import ProgressPage from './components/ProgressPage';
-import PlannerPage from './components/PlannerPage';
 import Header from './components/Header';
 import AccountPage from './components/AccountPage';
 import SettingsPage from './components/SettingsPage.jsx';
@@ -139,43 +138,29 @@ export default function App() {
   // If user is logged in, show appropriate page
   if (currentUser) {
     let contentComponent;
-      let onAddTaskHandler = () => navigateLoggedIn('addtask');
 
-      // addtask brings to addtaskpage
-    if (loggedInPage === 'addtask') {
-      // we dont want the button "add task" when we're adding a task
-      onAddTaskHandler=null;
-      contentComponent = (
-          <AddTaskPage 
-              onLogout={handleLogout} 
-              userEmail={currentUser.email} 
-              onBack={() => navigateLoggedIn('planner')}
-          />
-      );
-    } 
-    
-    //go to the planner page
-    else if (loggedInPage === 'planner') {
+    // Planner page (default)
+    if (loggedInPage === 'planner') {
         contentComponent = (
-            <PlannerPage 
+            <PlannerView 
                 key={refreshKey}
                 userEmail={currentUser.email} 
             />
         );
     }
       
-    //go to the setting page
+    // Settings page
     else if (loggedInPage === 'settings') {
         contentComponent = <SettingsPage />; 
     }
 
-    //go to the account page
+    // Account page
     else if (loggedInPage === 'account') {
         contentComponent = <AccountPage 
         currentUser={currentUser} />;
     }
     
-    // it will be the default page
+    // Progress page (default fallback)
     else { 
         contentComponent = (
             <ProgressPage 
@@ -186,17 +171,16 @@ export default function App() {
         );
     }
 
-    // header is always shown when logged in
+    // Header is always shown when logged in
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-slate-900">
             <Header 
                 userEmail={currentUser.email} 
                 onLogout={handleLogout} 
                 currentPage={loggedInPage}
-                onAddTask={onAddTaskHandler}
                 onNavigate={navigateLoggedIn}
             />
-            <main >
+            <main>
                 {contentComponent}
             </main>
         </div>
