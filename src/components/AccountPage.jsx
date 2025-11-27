@@ -148,10 +148,9 @@ function AccountPage({ currentUser, onUpdateCurrentUser, onLogout}) {
         //delete the user
         localStorage.removeItem("cramguard_currentUser");
 
-        //delete the tasks linked to the user
-        const tasksData = JSON.parse(localStorage.getItem("cramguard_tasks") || "{}");
-        delete tasksData[currentUser.email];
-        localStorage.setItem("cramguard_tasks", JSON.stringify(tasksData));
+        //delete the tasks and blocks linked to the user
+        localStorage.removeItem(`cramguard_tasks_${currentUser.email}`);
+        localStorage.removeItem(`cramguard_blocks_${currentUser.email}`);
 
         alert("Your account has been deleted.");
 
